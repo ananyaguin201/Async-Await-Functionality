@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promises Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ea8282;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        h1{
+            color: #d35252;
+        }
+        .container {
+            background-color: #f5cbcb;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 400px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #5c0707;;
+            color: rgb(144, 201, 227);
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #c74d94;
+        }
+
+        #output {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #cea0a0;
+            color: #d35252;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Fetch Posts</h1>
+        <button id="fetchBtn">Fetch Data</button>
+        <div id="output">Click the button to fetch data</div>
+    </div>
+
+    <script>
+        // Function to fetch posts with a timeout of 5 seconds
+        function fetchPostsWithTimeout(url, timeout = 5000) {
+            return new Promise((resolve, reject) => {
+                const timeoutId = setTimeout(() => {
+                    reject(new Error('Operation timed out.'));
+                }, timeout);
+
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        clearTimeout(timeoutId);
+                        resolve(data);
+                    })
+                    .catch(error => {
+                        clearTimeout(timeoutId);
+                        reject(error);
+                    });
+            });
+        }
+
+        document.getElementById('fetchBtn').addEventListener('click', function () {
+            const outputDiv = document.getElementById('output');
+            outputDiv.textContent = 'Loading...';
+
+            fetchPostsWithTimeout('https://dummyjson.com/posts')
+                .then(data => {
+                    const posts = data.posts;
+                    outputDiv.innerHTML = posts.map(post => `
+                        <h3>${post.title}</h3>
+                        <p>${post.body}</p>
+                    `).join('');
+                })
+                .catch(error => {
+                    outputDiv.textContent = error.message;
+                });
+        });
+    </script>
+</body>
+</html>
